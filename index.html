@@ -1,0 +1,35 @@
+rec.onresult = (event) => {
+            const input = event.results[0][0].transcript;
+            let output = "";
+
+            // تبدیل کلمات به عدد (برای اینکه ربات بفهمه چی گفتی)
+            const numberMap = { "یک": 1, "دو": 2, "سه": 3, "چهار": 4, "پنج": 5, "شش": 6, "هفت": 7, "هشت": 8, "نه": 9, "ده": 10, "یازده": 11, "دوازده": 12, "سیزده": 13, "چهارده": 14, "پانزده": 15, "شانزده": 16, "هفده": 17, "هجده": 18, "نوزده": 19, "بیست": 20 };
+            
+            if (input.includes("بازی")) {
+                secretNum = Math.floor(Math.random() * 20) + 1;
+                gameActive = true;
+                output = "عدد رو انتخاب کردم، حالا حدس بزن.";
+            } else if (gameActive) {
+                // پیدا کردن عدد توی حرف‌های تو
+                let guess = parseInt(input.match(/\d+/)); // اگه عدد رو به صورت ریاضی گفتی
+                if (isNaN(guess)) { // اگه عدد رو به صورت کلمه گفتی
+                    for (let key in numberMap) { if (input.includes(key)) guess = numberMap[key]; }
+                }
+
+                if (isNaN(guess)) {
+                    output = "داداش عددی نشنیدم، دوباره بگو!";
+                } else if (guess === secretNum) {
+                    output = "ایول! درست حدس زدی، تو بردی!";
+                    gameActive = false;
+                } else {
+                    output = guess < secretNum ? "نه، عدد بزرگتره!" : "نه، عدد کوچیکتره!";
+                }
+            } else {
+                output = "اول بگو 'بازی' تا شروع کنیم.";
+            }
+
+            document.getElementById('text').innerText = output;
+            const synth = new SpeechSynthesisUtterance(output);
+            synth.lang = 'fa-IR';
+            window.speechSynthesis.speak(synth);
+        };
